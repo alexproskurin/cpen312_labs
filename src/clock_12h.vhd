@@ -23,7 +23,8 @@ architecture A of clock_12h is
 	signal hr_reset_t: std_logic;
 	signal clk_1hz : std_logic;
 	signal sec_low, sec_high, min_low, min_high, hr_low, hr_high : integer := 0;
-	signal sec_low_t, sec_high_t, min_low_t, min_high_t, hr_low_t, hr_high_t : integer := 0;
+	signal sec_low_t, sec_high_t, min_low_t, min_high_t, hr_high_t : integer := 0;
+	signal hr_low_t : integer := 1;
 	signal sec_carry, min_carry : integer := 0;
 	
 begin
@@ -123,56 +124,48 @@ begin
 				sec_low <= 0;
 				if (sec_high = 5) then
 					sec_high <= 0;
-					sec_carry <= 1;
+					-- INCREMENT MINUTES
+						if (min_low = 9) then
+							min_low <= 0;
+							if (min_high = 5) then
+								min_high <= 0;
+								-- INCREMENT HOURS
+									if (hr_reset = '0') then
+										if (hr_low = 9) then
+											hr_low <= 0;
+											hr_reset <= '1';
+											if (hr_high = 1) then
+												hr_high <= 0;
+											else
+												hr_high <= hr_high +1;
+											end if;
+										else
+											hr_low <= hr_low +1;
+										end if;
+									else
+										if (hr_low = 2) then
+											hr_low <= 1;
+											hr_reset <= '0';
+											if (hr_high = 1) then
+												hr_high <= 0;
+											else
+												hr_high <= hr_high +1;
+											end if;
+										else
+											hr_low <= hr_low +1;
+										end if;
+									end if;
+							else
+								min_high <= min_high +1;
+							end if;
+						else
+							min_low <= min_low +1;
+						end if;
 				else
 					sec_high <= sec_high +1;
 				end if;
 			else
 				sec_low <= sec_low +1;
-			end if;
-			-- INCREMENT MINUTES
-			if (sec_carry = 1) then
-				if (min_low = 9) then
-					min_low <= 0;
-					if (min_high = 5) then
-						min_high <= 0;
-						min_carry <= 1;
-					else
-						min_high <= min_high +1;
-					end if;
-				else
-					min_low <= min_low +1;
-				end if;
-				sec_carry <= 0;
-			end if;
-			-- INCREMENT HOURS
-			if (min_carry = 1) then
-				if (hr_reset = '0') then
-					if (hr_low = 9) then
-						hr_low <= 0;
-						hr_reset <= '1';
-						if (hr_high = 1) then
-							hr_high <= 0;
-						else
-							hr_high <= hr_high +1;
-						end if;
-					else
-						hr_low <= hr_low +1;
-					end if;
-				else
-					if (hr_low = 2) then
-						hr_low <= 1;
-						hr_reset <= '0';
-						if (hr_high = 1) then
-							hr_high <= 0;
-						else
-							hr_high <= hr_high +1;
-						end if;
-					else
-						hr_low <= hr_low +1;
-					end if;
-				end if;
-				min_carry <= 0;
 			end if;
 		end if;
 	else
