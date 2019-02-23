@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 USE IEEE.STD_LOGIC_ARITH.all; 
 USE IEEE.STD_LOGIC_UNSIGNED.all;
+use ieee.numeric_std.all;
 
 entity clock_12h is
 	port
@@ -108,6 +109,64 @@ begin
 			end if;
 		end if;
 	end process;
+	
+	--STARTING THE CLOCK
+	process(key_start)
+	begin
+		if (falling_edge(key_start)) then
+			if (clk_1hz = '1') then
+				-- Increment seconds
+				if (sec_low = 9) then
+					sec_low <= 0;
+					if (sec_high = 5) then
+						sec_high <= 0;
+					else
+						sec_high <= sec_high +1;
+					end if;
+				else
+					sec_low <= sec_low +1;
+				end if;
+				-- Increment min 
+				if (min_low = 9) then
+					min_low <= 0;
+					if (min_high = 5) then
+						min_high <= 0;
+					else
+						min_high <= min_high +1;
+					end if;
+				else
+					min_low <= min_low +1;
+				end if;
+				-- Increment hrs
+				if (hr_reset = '0') then
+					if (hr_low = 9) then
+						hr_low <= 0;
+						hr_reset <= '1';
+						if (hr_high = 1) then
+							hr_high <= 0;
+						else
+							hr_high <= hr_high +1;
+						end if;
+					else
+						hr_low <= hr_low +1;
+					end if;
+				else
+					if (hr_low = 2) then
+						hr_low <= 0;
+						hr_reset <= '0';
+						if (hr_high = 1) then
+							hr_high <= 0;
+						else
+							hr_high <= hr_high +1;
+						end if;
+					else
+						hr_low <= hr_low +1;
+					end if;
+				end if;
+			end if;
+		end if;
+	end process;	
+	
 	-- Process Statement; (optional)
 
 	-- Concurrent Procedure Call (optional)
@@ -121,5 +180,10 @@ begin
 	-- Component Instantiation Statement (optional)
 
 	-- Generate Statement (optional)
-
+sec_l <= std_logic_vector(to_unsigned(sec_low, sec_l'length));
+sec_h <= std_logic_vector(to_unsigned(sec_high, sec_h'length));
+min_l <= std_logic_vector(to_unsigned(min_low, min_l'length));
+min_h <= std_logic_vector(to_unsigned(min_high, min_h'length));
+hr_l <= std_logic_vector(to_unsigned(hr_low, hr_l'length));
+hr_h <= std_logic_vector(to_unsigned(hr_high, hr_h'length));
 end A;
