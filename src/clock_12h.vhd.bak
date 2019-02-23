@@ -1,0 +1,28 @@
+library ieee;
+use ieee.std_logic_1164.all;
+USE IEEE.STD_LOGIC_ARITH.all; 
+USE IEEE.STD_LOGIC_UNSIGNED.all;
+
+entity clock_12h is
+	generic
+	(
+		CLK_50	: in  std_logic;
+		...
+		<name>	: <type>  :=	<default_value>
+	);
+
+
+	port
+	(
+		-- Input ports
+		<name>	: in  <type>;
+		<name>	: in  <type> := <default_value>;
+
+		-- Inout ports
+		<name>	: inout <type>;
+
+		-- Output ports
+		<name>	: out <type>;
+		<name>	: out <type> := <default_value>
+	);
+end <entity_name>;
